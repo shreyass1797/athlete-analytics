@@ -1,0 +1,37 @@
+# =========================
+# Operating System
+# =========================
+.DS_Store
+Thumbs.db
+
+# =========================
+# IDEs and Editors
+# =========================
+.vscode/
+.idea/
+
+# =========================
+# Java / Spring Boot (Backend)
+# =========================
+backend/target/
+*.class
+*.log
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# Python (Dashboard & ML-Engine)
+# =========================
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual Environments
+.venv/
+venv/
+
+# =========================
+# Security & Secrets
+# =========================
+.env
+*.pem
