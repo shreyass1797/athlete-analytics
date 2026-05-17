@@ -400,6 +400,7 @@ else:
                     # Formatting for display
                     df_raw_w['date'] = pd.to_datetime(df_raw_w['date'])
                     df_raw_w = df_raw_w.sort_values('date', ascending=False)
+                    df_raw_w['date'] = df_raw_w['date'].dt.date
                     st.dataframe(
                         df_raw_w[['date', 'type', 'durationMinutes', 'primaryFocus', 'rpe', 'volumeLoad', 'distanceKm']],
                         use_container_width=True, hide_index=True
@@ -414,6 +415,7 @@ else:
                     df_raw_s = pd.DataFrame(raw_sessions)
                     df_raw_s['date'] = pd.to_datetime(df_raw_s['date'])
                     df_raw_s = df_raw_s.sort_values('date', ascending=False)
+                    df_raw_s['date'] = df_raw_s['date'].dt.date
                     st.dataframe(
                         df_raw_s[['date', 'type', 'minutesPlayed', 'perceivedFitnessLevel', 'injuriesNiggles']],
                         use_container_width=True, hide_index=True
@@ -431,7 +433,8 @@ else:
             df_m = pd.DataFrame(metrics_history)
             df_m['date'] = pd.to_datetime(df_m['date'])
             df_m = df_m.sort_values('date', ascending=False)
-
+            df_m['date'] = df_m['date'].dt.date
+            
             # Readiness Chart
             fig_ready = px.line(df_m, x='date', y=['sleepHours', 'sorenessScore'], 
                                title='Recovery Correlation: Sleep vs. Soreness',
