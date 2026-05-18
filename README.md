@@ -31,7 +31,7 @@ A reactive, multi-page web dashboard. Orchestrates HTTP request flows between th
 | | JJWT | 0.11.5 |
 | | Lombok | (managed by Spring Boot 4.0.6) |
 | API Docs | Springdoc OpenAPI (Swagger UI) | 3.0.3 |
-| Database | PostgreSQL | — |
+| Database | PostgreSQL | 16 |
 | ML Engine | FastAPI | 0.136.1 |
 | | scikit-learn | 1.8.0 |
 | | Pandas | 3.0.3 |
@@ -40,6 +40,7 @@ A reactive, multi-page web dashboard. Orchestrates HTTP request flows between th
 | Dashboard | Streamlit | 1.57.0 |
 | | Plotly | 6.7.0 |
 | | Requests | 2.34.1 |
+| Infrastructure | Docker + Docker Compose | — |
 
 ---
 
@@ -48,6 +49,8 @@ A reactive, multi-page web dashboard. Orchestrates HTTP request flows between th
 - **Secure Authentication** — Full register/login flow with stateless JWT issuance and strict per-endpoint access control.
 - **Workload & Readiness Tracking** — Dedicated schemas for gym sessions (calisthenics/strength), field sessions (football/cardio), and daily morning readiness metrics (sleep, weight, resting heart rate).
 - **Predictive Analytics** — Implements real-world sports science math (ACWR) to dynamically chart fatigue zones and flag high-risk training days before an injury occurs.
+- **Query-Optimised Time-Series Storage** — Composite indexes on `(athlete_id, timestamp)` across all time-series tables (workouts, sessions, metrics) ensure the query planner retrieves chronological data efficiently as the dataset grows, without full table scans.
+- **Fully Containerised** — All four services (PostgreSQL, Spring Boot, FastAPI, Streamlit) are orchestrated via Docker Compose with health-checked service dependencies and environment-based credential injection.
 - **Interactive Visualisations** — Stacked bar charts for systemic daily load, line charts for recovery correlations, and session history logs.
 
 ---
@@ -109,39 +112,37 @@ Recovery correlation chart tracking sleep hours vs. soreness score over time. Fu
 ## Local Setup
 
 ### Prerequisites
-- Java 25
-- Maven
-- Python 3.9+
-- PostgreSQL running locally
+- Docker Desktop
 
-### 1. Start the Core Engine
+That's it. All services are fully containerised — no local Java, Python, or PostgreSQL installation required.
 
-```bash
-cd backend-core
-mvn spring-boot:run
-```
-
-Server starts on `http://localhost:8080`. Swagger UI at `http://localhost:8080/swagger-ui/index.html`.
-
-### 2. Start the Intelligence Node
+### 1. Configure environment variables
 
 ```bash
-cd ml-engine
-pip install -r requirements.txt
-uvicorn main:app --port 8000
+cp .env.example .env
 ```
 
-ML engine starts on `http://localhost:8000`.
+Open `.env` and fill in your database password and JWT secret.
 
-### 3. Boot the Presentation Layer
+### 2. Start all services
 
 ```bash
-cd frontend-dashboard
-pip install -r requirements.txt
-streamlit run dashboard.py
+docker compose up --build
 ```
 
-The dashboard will open automatically in your default browser.
+Docker Compose will start all four services in the correct order, with health-checked dependencies ensuring the database is ready before the backend attempts to connect.
+
+| Service | URL |
+|---|---|
+| Dashboard | http://localhost:8501 |
+| Backend API | http://localhost:8080 |
+| Swagger UI | http://localhost:8080/swagger-ui/index.html |
+| ML Engine | http://localhost:8000 |
+
+To stop:
+```bash
+docker compose down
+```
 
 ---
 
@@ -163,7 +164,7 @@ This project is part of a three-project backend portfolio targeting fresher SDE/
 |---|---|
 | IRCTC Clone | Pessimistic locking, Single Table Inheritance, Spring Security |
 | Expense Tracker | JWT auth, IDOR prevention, JPQL aggregations, global exception handling |
-| **Athlete Analytics Engine** | **Microservice architecture, ML integration, FastAPI, ACWR, personalised modelling** |
+| **Athlete Analytics Engine** | **Microservice architecture, ML integration, FastAPI, ACWR, composite indexing, Docker Compose orchestration, personalised modelling** |
 
 ---
 
