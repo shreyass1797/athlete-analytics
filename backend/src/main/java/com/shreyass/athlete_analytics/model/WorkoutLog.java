@@ -1,15 +1,28 @@
 package com.shreyass.athlete_analytics.model;
 
-import jakarta.persistence.*;
+import java.time.LocalDate;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Index;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
-import java.time.LocalDate;
-
 @Data
 @Entity
-@Table(name = "workout_logs")
+@Table(name = "workout_logs", indexes = {
+    @Index(name = "idx_workout_logs_user_date", columnList = "user_id, date DESC")
+})
 public class WorkoutLog {
 
     @Id
