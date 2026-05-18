@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import requests
 import pandas as pd
@@ -8,7 +9,7 @@ from datetime import date
 # --- Page Configuration ---
 st.set_page_config(page_title="Athlete Analytics", page_icon="⚡", layout="wide")
 
-JAVA_API_BASE = "http://localhost:8080/api"
+JAVA_API_BASE = os.getenv("JAVA_API_BASE", "http://localhost:8080/api")
 
 # --- 1. State Management Initialization ---
 if 'jwt_token' not in st.session_state:
@@ -189,7 +190,7 @@ def generate_and_log_insight(token, log_date):
             })
 
     # --- 3. Ask the Stateless FastAPI Engine for the Prediction ---
-    fastapi_url = "http://localhost:8000/predict"
+    fastapi_url = os.getenv("ML_ENGINE_URL", "http://localhost:8000") + "/predict"
     ml_payload = {"workouts": formatted_workouts}
 
     try:

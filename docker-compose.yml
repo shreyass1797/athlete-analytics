@@ -1,0 +1,57 @@
+services:
+
+  postgres:
+    image: postgres:16
+    container_name: athlete-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend-core:
+    build:
+      context: ./backend
+    container_name: backend-core
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/${POSTGRES_DB}
+      SPRING_DATASOURCE_USERNAME: ${POSTGRES_USER}
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      APPLICATION_SECURITY_JWT_SECRET_KEY: ${JWT_SECRET}
+      APPLICATION_SECURITY_JWT_EXPIRATION: ${JWT_EXPIRATION}
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ml-engine:
+    build:
+      context: ./ml-engine
+    container_name: ml-engine
+    ports:
+      - "8000:8000"
+
+  frontend-dashboard:
+    build:
+      context: ./dashboard
+    container_name: frontend-dashboard
+    environment:
+      JAVA_API_BASE: http://backend-core:8080/api
+      ML_ENGINE_URL: http://ml-engine:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - backend-core
+      - ml-engine
+
+volumes:
+  postgres_data:
